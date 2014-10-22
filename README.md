@@ -1,4 +1,1 @@
-AdvancedBoost
-=============
-
-A boost mode for JC2MP with some nice advantages over the "default" one.
+For more information about this script, go to http://www.jc-mp.com/forums/index.php/topic,5258.0.html.
