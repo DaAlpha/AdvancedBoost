@@ -1,3 +1,4 @@
+-- Created by DaAlpha
 class 'Boost'
 
 function Boost:__init()
