@@ -37,57 +37,62 @@ function Boost:CreateWindow()
 	self.window:SetVisible(self.window_open)
 	self.window:Subscribe("WindowClosed", self, self.WindowClosed)
 
-	self.land_checkbox = LabeledCheckBox.Create(self.window)
-	self.land_checkbox:SetSize(Vector2(200, 20))
-	self.land_checkbox:SetDock(GwenPosition.Top)
-	self.land_checkbox:GetLabel():SetText("Land vehicle boost enabled")
-	self.land_checkbox:GetCheckBox():Subscribe("CheckChanged",
-		function() self.land_enabled = self.land_checkbox:GetCheckBox():GetChecked() end)
+	local land_checkbox = LabeledCheckBox.Create(self.window)
+	land_checkbox:SetSize(Vector2(200, 20))
+	land_checkbox:SetDock(GwenPosition.Top)
+	land_checkbox:GetLabel():SetText("Land vehicle boost enabled")
+	land_checkbox:GetCheckBox():Subscribe("CheckChanged",
+		function() self.land_enabled = land_checkbox:GetCheckBox():GetChecked() end)
+	self.land_checkbox = land_checkbox:GetCheckBox()
 
-	self.boat_checkbox = LabeledCheckBox.Create(self.window)
-	self.boat_checkbox:SetSize(Vector2(200, 20))
-	self.boat_checkbox:SetDock(GwenPosition.Top)
-	self.boat_checkbox:GetLabel():SetText("Boat boost enabled")
-	self.boat_checkbox:GetCheckBox():Subscribe("CheckChanged",
-		function() self.boat_enabled = self.boat_checkbox:GetCheckBox():GetChecked() end)
+	local boat_checkbox = LabeledCheckBox.Create(self.window)
+	boat_checkbox:SetSize(Vector2(200, 20))
+	boat_checkbox:SetDock(GwenPosition.Top)
+	boat_checkbox:GetLabel():SetText("Boat boost enabled")
+	boat_checkbox:GetCheckBox():Subscribe("CheckChanged",
+		function() self.boat_enabled = boat_checkbox:GetCheckBox():GetChecked() end)
+	self.boat_checkbox = boat_checkbox:GetCheckBox()
 
-	self.heli_checkbox = LabeledCheckBox.Create(self.window)
-	self.heli_checkbox:SetSize(Vector2(200, 20))
-	self.heli_checkbox:SetDock(GwenPosition.Top)
-	self.heli_checkbox:GetLabel():SetText("Helicopter boost enabled")
-	self.heli_checkbox:GetCheckBox():Subscribe("CheckChanged",
-		function() self.heli_enabled = self.heli_checkbox:GetCheckBox():GetChecked() end)
+	local heli_checkbox = LabeledCheckBox.Create(self.window)
+	heli_checkbox:SetSize(Vector2(200, 20))
+	heli_checkbox:SetDock(GwenPosition.Top)
+	heli_checkbox:GetLabel():SetText("Helicopter boost enabled")
+	heli_checkbox:GetCheckBox():Subscribe("CheckChanged",
+		function() self.heli_enabled = heli_checkbox:GetCheckBox():GetChecked() end)
+	self.heli_checkbox = heli_checkbox:GetCheckBox()
 
-	self.plane_checkbox = LabeledCheckBox.Create(self.window)
-	self.plane_checkbox:SetSize(Vector2(200, 20))
-	self.plane_checkbox:SetDock(GwenPosition.Top)
-	self.plane_checkbox:GetLabel():SetText("Plane boost enabled")
-	self.plane_checkbox:GetCheckBox():Subscribe("CheckChanged",
-		function() self.plane_enabled = self.plane_checkbox:GetCheckBox():GetChecked() end)
+	local plane_checkbox = LabeledCheckBox.Create(self.window)
+	plane_checkbox:SetSize(Vector2(200, 20))
+	plane_checkbox:SetDock(GwenPosition.Top)
+	plane_checkbox:GetLabel():SetText("Plane boost enabled")
+	plane_checkbox:GetCheckBox():Subscribe("CheckChanged",
+		function() self.plane_enabled = plane_checkbox:GetCheckBox():GetChecked() end)
+	self.plane_checkbox = plane_checkbox:GetCheckBox()
 
-	self.text_checkbox = LabeledCheckBox.Create(self.window)
-	self.text_checkbox:SetSize(Vector2(200, 20))
-	self.text_checkbox:SetDock(GwenPosition.Top)
-	self.text_checkbox:GetLabel():SetText("Boost text enabled")
-	self.text_checkbox:GetCheckBox():Subscribe("CheckChanged",
-		function() self.text_enabled = self.text_checkbox:GetCheckBox():GetChecked() end)
+	local text_checkbox = LabeledCheckBox.Create(self.window)
+	text_checkbox:SetSize(Vector2(200, 20))
+	text_checkbox:SetDock(GwenPosition.Top)
+	text_checkbox:GetLabel():SetText("Boost text enabled")
+	text_checkbox:GetCheckBox():Subscribe("CheckChanged",
+		function() self.text_enabled = text_checkbox:GetCheckBox():GetChecked() end)
+	self.text_checkbox = text_checkbox:GetCheckBox()
 end
 
 function Boost:UpdateCheckboxes()
-	self.land_checkbox:GetCheckBox():SetChecked(self.land_enabled)
-	self.boat_checkbox:GetCheckBox():SetChecked(self.boat_enabled)
-	self.heli_checkbox:GetCheckBox():SetChecked(self.heli_enabled)
-	self.plane_checkbox:GetCheckBox():SetChecked(self.plane_enabled)
-	self.text_checkbox:GetCheckBox():SetChecked(self.text_enabled)
+	self.land_checkbox:SetChecked(self.land_enabled)
+	self.boat_checkbox:SetChecked(self.boat_enabled)
+	self.heli_checkbox:SetChecked(self.heli_enabled)
+	self.plane_checkbox:SetChecked(self.plane_enabled)
+	self.text_checkbox:SetChecked(self.text_enabled)
 end
 
 function Boost:WindowClosed()
 	local t = {}
-	t.land_enabled = self.land_checkbox:GetCheckBox():GetChecked()
-	t.boat_enabled = self.boat_checkbox:GetCheckBox():GetChecked()
-	t.heli_enabled = self.heli_checkbox:GetCheckBox():GetChecked()
-	t.plane_enabled = self.plane_checkbox:GetCheckBox():GetChecked()
-	t.text_enabled = self.text_checkbox:GetCheckBox():GetChecked()
+	t.land_enabled = self.land_enabled
+	t.boat_enabled = self.boat_enabled
+	t.heli_enabled = self.heli_enabled
+	t.plane_enabled = self.plane_enabled
+	t.text_enabled = self.text_enabled
 
 	Network:Send("UpdateSettings", t)
 
@@ -106,6 +111,7 @@ function Boost:UpdateSettings(args)
 	self.heli_enabled = args.heli_enabled
 	self.plane_enabled = args.plane_enabled
 	self.text_enabled = args.text_enabled
+
 	self:UpdateCheckboxes()
 end
 
