@@ -4,7 +4,7 @@ class 'Boost'
 function Boost:__init()
 	self.multiplier = 6 -- Determines how many times the speed will be multiplied each tick
 
-	SQL:Execute("CREATE TABLE IF NOT EXISTS Boost (steamid INTEGER(20) UNIQUE, land_enabled VARCHAR(5), boat_enabled VARCHAR(5), heli_enabled VARCHAR(5), plane_enabled VARCHAR(5), text_enabled VARCHAR(5))")
+	SQL:Execute("CREATE TABLE IF NOT EXISTS Boost (steamid INTEGER(20) UNIQUE, land_enabled VARCHAR(5), boat_enabled VARCHAR(5), heli_enabled VARCHAR(5), plane_enabled VARCHAR(5), text_enabled VARCHAR(5), controller_enabled VARCHAR(5))")
 
 	Network:Subscribe("Boost", self, self.Boost)
 	Network:Subscribe("UpdateSettings", self, self.UpdateSettings)
@@ -23,13 +23,14 @@ function Boost:Boost(args, sender)
 end
 
 function Boost:UpdateSettings(args, sender)
-	local command = SQL:Command("INSERT OR REPLACE INTO Boost (steamid, land_enabled, boat_enabled, heli_enabled, plane_enabled, text_enabled) VALUES (?, ?, ?, ?, ?, ?)")
+	local command = SQL:Command("INSERT OR REPLACE INTO Boost (steamid, land_enabled, boat_enabled, heli_enabled, plane_enabled, text_enabled, controller_enabled) VALUES (?, ?, ?, ?, ?, ?, ?)")
 	command:Bind(1, sender:GetSteamId().id)
 	command:Bind(2, tostring(args.land_enabled))
 	command:Bind(3, tostring(args.boat_enabled))
 	command:Bind(4, tostring(args.heli_enabled))
 	command:Bind(5, tostring(args.plane_enabled))
 	command:Bind(6, tostring(args.text_enabled))
+	command:Bind(7, tostring(args.controller_enabled))
 	command:Execute()
 end
 
@@ -45,6 +46,7 @@ function Boost:ClientModuleLoad(args)
 		t.heli_enabled = self:STB(result[1].heli_enabled)
 		t.plane_enabled = self:STB(result[1].plane_enabled)
 		t.text_enabled = self:STB(result[1].text_enabled)
+		t.controller_enabled = self:STB(result[1].controller_enabled)
 		Network:Send(args.player, "UpdateSettings", t)
 	end
 end
