@@ -182,11 +182,11 @@ end
 
 function Boost:Boost()
   if self.timer:GetMilliseconds() > self.interval then
-  	local v = LocalPlayer:GetVehicle()
-  	if IsValid(v) then
-  		local forward = v:GetAngle() * Vector3(0, 0, -1 * self.multiplier)
-  		v:SetLinearVelocity(v:GetLinearVelocity() + forward)
-  	end
+    local v = LocalPlayer:GetVehicle()
+    if IsValid(v) then
+      local forward = v:GetAngle() * Vector3(0, 0, -1 * self.multiplier)
+      v:SetLinearVelocity(v:GetLinearVelocity() + forward)
+    end
     self.timer:Restart()
   end
 end

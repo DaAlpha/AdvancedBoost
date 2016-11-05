@@ -2,52 +2,52 @@
 class 'Boost'
 
 function Boost:__init()
-	-- Settings
+  -- Settings
   self.interval = 3600 * 6 -- DB write interval in seconds (Default: 6h)
 
-	-- Globals
-	self.settings	= {}
-	self.diff			= {}
-	self.nextSave	= self.interval
+  -- Globals
+  self.settings  = {}
+  self.diff      = {}
+  self.nextSave  = self.interval
 
-	-- Create DB table
-	SQL:Execute("CREATE TABLE IF NOT EXISTS boost_settings (steamid TEXT PRIMARY KEY, " ..
-		"land_enabled INTEGER, boat_enabled INTEGER, heli_enabled INTEGER, " ..
-		"plane_enabled INTEGER, text_enabled INTEGER, controller_enabled INTEGER)")
+  -- Create DB table
+  SQL:Execute("CREATE TABLE IF NOT EXISTS boost_settings (steamid TEXT PRIMARY KEY, " ..
+    "land_enabled INTEGER, boat_enabled INTEGER, heli_enabled INTEGER, " ..
+    "plane_enabled INTEGER, text_enabled INTEGER, controller_enabled INTEGER)")
 
   -- Load all DB entries into the cache
   local i = 0
   local timer = Timer()
   for _, row in ipairs(SQL:Query("SELECT * FROM boost_settings"):Execute()) do
-    self.settings[row.steamid] 							= {}
-		self.settings[row.steamid].landBoost		= tonumber(row.land_enabled)
-		self.settings[row.steamid].boatBoost		= tonumber(row.boat_enabled)
-		self.settings[row.steamid].heliBoost		= tonumber(row.heli_enabled)
-		self.settings[row.steamid].planeBoost		= tonumber(row.plane_enabled)
-		self.settings[row.steamid].textEnabled	= tonumber(row.text_enabled)
-		self.settings[row.steamid].padEnabled		= tonumber(row.controller_enabled)
+    self.settings[row.steamid]              = {}
+    self.settings[row.steamid].landBoost    = tonumber(row.land_enabled)
+    self.settings[row.steamid].boatBoost    = tonumber(row.boat_enabled)
+    self.settings[row.steamid].heliBoost    = tonumber(row.heli_enabled)
+    self.settings[row.steamid].planeBoost   = tonumber(row.plane_enabled)
+    self.settings[row.steamid].textEnabled  = tonumber(row.text_enabled)
+    self.settings[row.steamid].padEnabled   = tonumber(row.controller_enabled)
     i = i + 1
   end
   print(string.format("Loaded %d boost settings in %dms.", i, timer:GetMilliseconds()))
 
-	-- Network
-	Network:Subscribe("ChangeSetting", self, self.ChangeSetting)
+  -- Network
+  Network:Subscribe("ChangeSetting", self, self.ChangeSetting)
 
-	-- Events
-	Events:Subscribe("ClientModuleLoad", self, self.ClientModuleLoad)
-	Events:Subscribe("ModuleUnload", self, self.ModuleUnload)
-	Events:Subscribe("PostTick", self, self.PostTick)
+  -- Events
+  Events:Subscribe("ClientModuleLoad", self, self.ClientModuleLoad)
+  Events:Subscribe("ModuleUnload", self, self.ModuleUnload)
+  Events:Subscribe("PostTick", self, self.PostTick)
 end
 
 function Boost:ChangeSetting(args, sender)
-	local steamid = sender:GetSteamId().string
-	if not self.settings[steamid] then
-		self.settings[steamid] = {}
-	end
-	if not self.diff[steamid] then
-		self.diff[steamid] = true
-	end
-	self.settings[steamid][args.setting] = args.value
+  local steamid = sender:GetSteamId().string
+  if not self.settings[steamid] then
+    self.settings[steamid] = {}
+  end
+  if not self.diff[steamid] then
+    self.diff[steamid] = true
+  end
+  self.settings[steamid][args.setting] = args.value
 end
 
 function Boost:ModuleUnload()
@@ -55,22 +55,22 @@ function Boost:ModuleUnload()
   local timer = Timer()
   local trans = SQL:Transaction()
   for steamid, _ in pairs(self.diff) do
-		local settings = self.settings[steamid]
-		if settings and next(settings) then -- Check if there are settings
-			local command = SQL:Command("INSERT OR REPLACE INTO boost_settings VALUES (?, ?, ?, ?, ?, ?, ?)")
-			command:Bind(1, steamid)
-			if settings.landBoost then command:Bind(2, settings.landBoost) end
-			if settings.boatBoost then command:Bind(3, settings.boatBoost) end
-			if settings.heliBoost then command:Bind(4, settings.heliBoost) end
-			if settings.planeBoost then command:Bind(5, settings.planeBoost) end
-			if settings.textEnabled then command:Bind(6, settings.textEnabled) end
-			if settings.padEnabled then command:Bind(7, settings.padEnabled) end
-			command:Execute()
-		else
-			local command = SQL:Command("DELETE FROM boost_settings WHERE steamid = ?")
-			command:Bind(1, steamid)
-			command:Execute()
-		end
+    local settings = self.settings[steamid]
+    if settings and next(settings) then -- Check if there are settings
+      local command = SQL:Command("INSERT OR REPLACE INTO boost_settings VALUES (?, ?, ?, ?, ?, ?, ?)")
+      command:Bind(1, steamid)
+      if settings.landBoost then command:Bind(2, settings.landBoost) end
+      if settings.boatBoost then command:Bind(3, settings.boatBoost) end
+      if settings.heliBoost then command:Bind(4, settings.heliBoost) end
+      if settings.planeBoost then command:Bind(5, settings.planeBoost) end
+      if settings.textEnabled then command:Bind(6, settings.textEnabled) end
+      if settings.padEnabled then command:Bind(7, settings.padEnabled) end
+      command:Execute()
+    else
+      local command = SQL:Command("DELETE FROM boost_settings WHERE steamid = ?")
+      command:Bind(1, steamid)
+      command:Execute()
+    end
     i = i + 1
   end
   trans:Commit()
@@ -86,7 +86,7 @@ function Boost:PostTick()
 end
 
 function Boost:ClientModuleLoad(args)
-	Network:Send(args.player, "UpdateSettings", self.settings[args.player:GetSteamId().string] or {})
+  Network:Send(args.player, "UpdateSettings", self.settings[args.player:GetSteamId().string] or {})
 end
 
 local boost = Boost()
