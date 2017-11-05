@@ -89,4 +89,4 @@ function Boost:ClientModuleLoad(args)
   Network:Send(args.player, "UpdateSettings", self.settings[args.player:GetSteamId().string] or {})
 end
 
-local boost = Boost()
+Boost()

@@ -27,15 +27,15 @@ function Boost:__init()
     [25] = true, [27] = true, [28] = true, [38] = true,
     [45] = true, [50] = true, [53] = true, [69] = true,
     [80] = true, [88] = true
-    }
+  }
   self.helis = {
     [3] = true, [14] = true, [37] = true, [57] = true,
     [62] = true, [64] = true, [65] = true, [67] = true
-    }
+  }
   self.planes = {
     [24] = true, [30] = true, [34] = true, [39] = true,
     [51] = true, [59] = true, [81] = true, [85] = true
-    }
+  }
 
   -- GUI Initiation Sub
   self.settingSub = Network:Subscribe("UpdateSettings", self, self.UpdateSettings)
@@ -212,4 +212,4 @@ function Boost:PlaneCheck(vehicle)
   return self.planeBoost and self.planes[vehicle:GetModelId()]
 end
 
-local boost = Boost()
+Boost()
