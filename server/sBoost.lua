@@ -10,6 +10,11 @@ function Boost:__init()
   self.diff      = {}
   self.nextSave  = self.interval
 
+  -- Note: self.nextSave defaults to self.interval instead of
+  -- Server:GetElapsedSeconds() because the latter returns wrong and very
+  -- high values when called during server startup which would result into
+  -- self.nextSave never being reached during the module runtime
+
   -- Create DB table
   SQL:Execute("CREATE TABLE IF NOT EXISTS boost_settings (steamid TEXT PRIMARY KEY, " ..
     "land_enabled INTEGER, boat_enabled INTEGER, heli_enabled INTEGER, " ..
@@ -19,13 +24,14 @@ function Boost:__init()
   local i = 0
   local timer = Timer()
   for _, row in ipairs(SQL:Query("SELECT * FROM boost_settings"):Execute()) do
-    self.settings[row.steamid]              = {}
-    self.settings[row.steamid].landBoost    = tonumber(row.land_enabled)
-    self.settings[row.steamid].boatBoost    = tonumber(row.boat_enabled)
-    self.settings[row.steamid].heliBoost    = tonumber(row.heli_enabled)
-    self.settings[row.steamid].planeBoost   = tonumber(row.plane_enabled)
-    self.settings[row.steamid].textEnabled  = tonumber(row.text_enabled)
-    self.settings[row.steamid].padEnabled   = tonumber(row.controller_enabled)
+    self.settings[row.steamid] = {
+      landBoost   = tonumber(row.land_enabled),
+      boatBoost   = tonumber(row.boat_enabled),
+      heliBoost   = tonumber(row.heli_enabled),
+      planeBoost  = tonumber(row.plane_enabled),
+      textEnabled = tonumber(row.text_enabled),
+      padEnabled  = tonumber(row.controller_enabled)
+    }
     i = i + 1
   end
   print(string.format("Loaded %d boost settings in %dms.", i, timer:GetMilliseconds()))
@@ -54,7 +60,7 @@ function Boost:ModuleUnload()
   local i = 0
   local timer = Timer()
   local trans = SQL:Transaction()
-  for steamid, _ in pairs(self.diff) do
+  for steamid in pairs(self.diff) do
     local settings = self.settings[steamid]
     if settings and next(settings) then -- Check if there are settings
       local command = SQL:Command("INSERT OR REPLACE INTO boost_settings VALUES (?, ?, ?, ?, ?, ?, ?)")
@@ -86,7 +92,7 @@ function Boost:PostTick()
 end
 
 function Boost:ClientModuleLoad(args)
-  Network:Send(args.player, "UpdateSettings", self.settings[args.player:GetSteamId().string] or {})
+  Network:Send(args.player, "UpdateSettings", self.settings[args.player:GetSteamId().string])
 end
 
 Boost()

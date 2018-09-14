@@ -45,18 +45,20 @@ function Boost:__init()
   Events:Subscribe("LocalPlayerInput", self, self.LocalPlayerInput)
 end
 
-function Boost:UpdateSettings(args) -- args = settings
+function Boost:UpdateSettings(settings)
   -- Unsubscribe
   Network:Unsubscribe(self.settingSub)
   self.settingSub = nil
 
-  -- Apply settings
-  if args.landBoost then self.landBoost = args.landBoost == 1 end
-  if args.boatBoost then self.boatBoost = args.boatBoost == 1 end
-  if args.heliBoost then self.heliBoost = args.heliBoost == 1 end
-  if args.planeBoost then self.planeBoost = args.planeBoost == 1 end
-  if args.textEnabled then self.textEnabled = args.textEnabled == 1 end
-  if args.padEnabled then self.padEnabled = args.padEnabled == 1 end
+  -- Apply settings if given
+  if settings then
+    if settings.landBoost then self.landBoost = settings.landBoost == 1 end
+    if settings.boatBoost then self.boatBoost = settings.boatBoost == 1 end
+    if settings.heliBoost then self.heliBoost = settings.heliBoost == 1 end
+    if settings.planeBoost then self.planeBoost = settings.planeBoost == 1 end
+    if settings.textEnabled then self.textEnabled = settings.textEnabled == 1 end
+    if settings.padEnabled then self.padEnabled = settings.padEnabled == 1 end
+  end
 
   -- Create main window
   self.window = Window.Create()
@@ -164,7 +166,8 @@ function Boost:AddSetting(text, setting, value, default)
   checkBox:GetLabel():SetText(text)
   checkBox:GetCheckBox():SetChecked(value)
   checkBox:GetCheckBox():Subscribe("CheckChanged", function(box)
-    self:UpdateSetting(setting, box:GetChecked(), default) end)
+    self:UpdateSetting(setting, box:GetChecked(), default)
+  end)
 end
 
 function Boost:UpdateSetting(setting, value, default)
