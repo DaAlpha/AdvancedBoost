@@ -51,12 +51,9 @@ function Boost:UpdateSettings(settings)
 
   -- Apply settings if given
   if settings then
-    if settings.landBoost then self.landBoost = settings.landBoost == 1 end
-    if settings.boatBoost then self.boatBoost = settings.boatBoost == 1 end
-    if settings.heliBoost then self.heliBoost = settings.heliBoost == 1 end
-    if settings.planeBoost then self.planeBoost = settings.planeBoost == 1 end
-    if settings.textEnabled then self.textEnabled = settings.textEnabled == 1 end
-    if settings.padEnabled then self.padEnabled = settings.padEnabled == 1 end
+    for setting, value in pairs(settings) do
+      self[setting] = value == 1
+    end
   end
 
   -- Create main window
