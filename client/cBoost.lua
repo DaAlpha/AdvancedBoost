@@ -3,7 +3,7 @@ class 'Boost'
 
 function Boost:__init()
   -- Default Settings
-  self.multiplier         = 3
+  self.strength           = 100
   self.defaultLandBoost   = true
   self.defaultBoatBoost   = true
   self.defaultHeliBoost   = true
@@ -18,9 +18,8 @@ function Boost:__init()
   self.planeBoost   = self.defaultPlaneBoost
   self.textEnabled  = self.defaultTextEnabled
   self.padEnabled   = self.defaultPadEnabled
-  self.timer        = Timer()
-  self.interval     = 50 -- ms
   self.windowOpen   = false
+  self.delta        = 0
 
   self.boats = {
     [5] = true, [6] = true, [16] = true, [19] = true,
@@ -112,10 +111,11 @@ function Boost:LocalPlayerInput(args)
   end
 end
 
-function Boost:Render()
+function Boost:Render(args)
   if not self:IsDriver() then return end
   if LocalPlayer:GetWorld() ~= DefaultWorld then return end
 
+  self.delta  = args.delta
   local v     = LocalPlayer:GetVehicle()
   local land  = self:LandCheck(v)
   local boat  = self:BoatCheck(v)
@@ -184,13 +184,10 @@ function Boost:UpdateSetting(setting, value, default)
 end
 
 function Boost:Boost()
-  if self.timer:GetMilliseconds() > self.interval then
-    local v = LocalPlayer:GetVehicle()
-    if IsValid(v) then
-      local forward = v:GetAngle() * Vector3(0, 0, -1 * self.multiplier)
-      v:SetLinearVelocity(v:GetLinearVelocity() + forward)
-    end
-    self.timer:Restart()
+  local v = LocalPlayer:GetVehicle()
+  if IsValid(v) then
+    v:SetLinearVelocity(v:GetLinearVelocity() + v:GetAngle() *
+      Vector3(0, 0, - self.strength * self.delta))
   end
 end
 
