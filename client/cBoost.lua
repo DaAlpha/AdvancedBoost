@@ -41,6 +41,8 @@ function Boost:__init()
 
   -- Events
   Events:Subscribe("Render", self, self.Render)
+  Events:Subscribe("ModuleLoad", self, self.ModuleLoad)
+  Events:Subscribe("ModuleUnload", self, self.ModuleUnload)
   Events:Subscribe("LocalPlayerInput", self, self.LocalPlayerInput)
 end
 
@@ -151,6 +153,21 @@ function Boost:Render(args)
     Render:DrawText(pos + Vector2.One, text, Color(0, 0, 0, 180), 18)
     Render:DrawText(pos, text, Color.White, 18)
   end
+end
+
+function Boost:ModuleLoad()
+  Events:Fire("HelpAddItem", {
+    name = "Boost",
+    text =
+      "Press Shift in a boat or land vehicle or Q in an air vehicle to boost.\n \n" ..
+      "Press LB on an Xbox Controller to boost in any type of vehicle.\n \n" ..
+      "Type /boost in chat to open the boost settings window.\n \n" ..
+      "Advanced Boost (public version) by DaAlpha, creator and owner of Alpha's Salt Factory"
+  })
+end
+
+function Boost:ModuleUnload()
+  Events:Fire("HelpRemoveItem", {name = "Boost"})
 end
 
 function Boost:ResolutionChange()
