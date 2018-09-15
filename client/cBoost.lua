@@ -143,7 +143,7 @@ function Boost:ModuleUnload()
 end
 
 function Boost:LocalPlayerChat(args)
-  if args.text:sub(1, 6):lower() == "/boost" then
+  if args.text:lower() == "/boost" then
     self:SetWindowOpen(true)
     return false
   end
