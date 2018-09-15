@@ -87,7 +87,7 @@ function Boost:SetWindowOpen(state)
 end
 
 function Boost:LocalPlayerChat(args)
-  if args.text:lower() == "/boost" then
+  if args.text:sub(1, 6):lower() == "/boost" then
     self:SetWindowOpen(true)
     return false
   end
