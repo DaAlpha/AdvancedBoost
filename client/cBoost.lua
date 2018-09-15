@@ -82,34 +82,6 @@ function Boost:UpdateSettings(settings)
   --self:SetWindowOpen(true)
 end
 
-function Boost:SetWindowOpen(state)
-  self.windowOpen = state
-  self.window:SetVisible(state)
-  Mouse:SetVisible(state)
-end
-
-function Boost:LocalPlayerChat(args)
-  if args.text:sub(1, 6):lower() == "/boost" then
-    self:SetWindowOpen(true)
-    return false
-  end
-end
-
-function Boost:LocalPlayerInput(args)
-  if self.windowOpen then return false end
-  if self.padEnabled
-      and args.input == Action.VehicleFireLeft
-      and LocalPlayer:GetWorld() == DefaultWorld
-      and Game:GetSetting(GameSetting.GamepadInUse) == 1 then
-    local vehicle = LocalPlayer:GetVehicle()
-    if IsValid(vehicle) and vehicle:GetDriver() == LocalPlayer
-        and (self:LandCheck(vehicle) or self:BoatCheck(vehicle)
-        or self:HeliCheck(vehicle) or self:PlaneCheck(vehicle)) then
-      self:Boost(vehicle)
-    end
-  end
-end
-
 function Boost:Render(args)
   if LocalPlayer:GetWorld() ~= DefaultWorld then return end
 
@@ -170,8 +142,36 @@ function Boost:ModuleUnload()
   Events:Fire("HelpRemoveItem", {name = "Boost"})
 end
 
+function Boost:LocalPlayerChat(args)
+  if args.text:sub(1, 6):lower() == "/boost" then
+    self:SetWindowOpen(true)
+    return false
+  end
+end
+
+function Boost:LocalPlayerInput(args)
+  if self.windowOpen then return false end
+  if self.padEnabled
+      and args.input == Action.VehicleFireLeft
+      and LocalPlayer:GetWorld() == DefaultWorld
+      and Game:GetSetting(GameSetting.GamepadInUse) == 1 then
+    local vehicle = LocalPlayer:GetVehicle()
+    if IsValid(vehicle) and vehicle:GetDriver() == LocalPlayer
+        and (self:LandCheck(vehicle) or self:BoatCheck(vehicle)
+        or self:HeliCheck(vehicle) or self:PlaneCheck(vehicle)) then
+      self:Boost(vehicle)
+    end
+  end
+end
+
 function Boost:ResolutionChange()
   self.window:SetPositionRel(Vector2(0.5, 0.5) - self.window:GetSizeRel() / 2)
+end
+
+function Boost:SetWindowOpen(state)
+  self.windowOpen = state
+  self.window:SetVisible(state)
+  Mouse:SetVisible(state)
 end
 
 function Boost:AddSetting(text, setting, value, default)
