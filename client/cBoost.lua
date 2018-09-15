@@ -98,39 +98,40 @@ end
 
 function Boost:LocalPlayerInput(args)
   if self.windowOpen then return false end
-  if self.padEnabled then
-    if args.input == Action.VehicleFireLeft then
-      if LocalPlayer:GetWorld() == DefaultWorld and self:IsDriver() and
-          Game:GetSetting(GameSetting.GamepadInUse) == 1 then
-        local v = LocalPlayer:GetVehicle()
-        if self:LandCheck(v) or self:BoatCheck(v) or self:HeliCheck(v) or self:PlaneCheck(v) then
-          self:Boost()
-        end
-      end
+  if self.padEnabled
+      and args.input == Action.VehicleFireLeft
+      and LocalPlayer:GetWorld() == DefaultWorld
+      and Game:GetSetting(GameSetting.GamepadInUse) == 1 then
+    local vehicle = LocalPlayer:GetVehicle()
+    if IsValid(vehicle) and vehicle:GetDriver() == LocalPlayer
+        and (self:LandCheck(vehicle) or self:BoatCheck(vehicle)
+        or self:HeliCheck(vehicle) or self:PlaneCheck(vehicle)) then
+      self:Boost(vehicle)
     end
   end
 end
 
 function Boost:Render(args)
-  if not self:IsDriver() then return end
   if LocalPlayer:GetWorld() ~= DefaultWorld then return end
 
+  local vehicle = LocalPlayer:GetVehicle()
+  if not IsValid(vehicle) then return end
+  if vehicle:GetDriver() ~= LocalPlayer then return end
+
   self.delta  = args.delta
-  local v     = LocalPlayer:GetVehicle()
-  local land  = self:LandCheck(v)
-  local boat  = self:BoatCheck(v)
-  local heli  = self:HeliCheck(v)
-  local plane = self:PlaneCheck(v)
+  local land  = self:LandCheck(vehicle)
+  local boat  = self:BoatCheck(vehicle)
+  local heli  = self:HeliCheck(vehicle)
+  local plane = self:PlaneCheck(vehicle)
 
   -- Boost
-  local v = LocalPlayer:GetVehicle()
   if land or boat then
     if Key:IsDown(160) then -- LShift
-      self:Boost()
+      self:Boost(vehicle)
     end
   elseif heli or plane then
     if Key:IsDown(81) then -- Q
-      self:Boost()
+      self:Boost(vehicle)
     end
   end
 
@@ -183,16 +184,9 @@ function Boost:UpdateSetting(setting, value, default)
   Network:Send("ChangeSetting", {setting = setting, value = value})
 end
 
-function Boost:Boost()
-  local v = LocalPlayer:GetVehicle()
-  if IsValid(v) then
-    v:SetLinearVelocity(v:GetLinearVelocity() + v:GetAngle() *
-      Vector3(0, 0, - self.strength * self.delta))
-  end
-end
-
-function Boost:IsDriver()
-  return LocalPlayer:InVehicle() and LocalPlayer == LocalPlayer:GetVehicle():GetDriver()
+function Boost:Boost(vehicle)
+  vehicle:SetLinearVelocity(vehicle:GetLinearVelocity() +
+    vehicle:GetAngle() * Vector3(0, 0, - self.strength * self.delta))
 end
 
 function Boost:LandCheck(vehicle)
