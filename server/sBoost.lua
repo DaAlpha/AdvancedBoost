@@ -56,6 +56,10 @@ function Boost:ChangeSetting(args, sender)
   self.settings[steamid][args.setting] = args.value
 end
 
+function Boost:ClientModuleLoad(args)
+  Network:Send(args.player, "UpdateSettings", self.settings[args.player:GetSteamId().string])
+end
+
 function Boost:ModuleUnload()
   local i = 0
   local timer = Timer()
@@ -89,10 +93,6 @@ function Boost:PostTick()
     self:ModuleUnload()
     self.nextSave = Server:GetElapsedSeconds() + self.interval
   end
-end
-
-function Boost:ClientModuleLoad(args)
-  Network:Send(args.player, "UpdateSettings", self.settings[args.player:GetSteamId().string])
 end
 
 Boost()
