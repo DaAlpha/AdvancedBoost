@@ -2,6 +2,14 @@
 class 'Boost'
 
 function Boost:__init()
+  -- Settings
+  self.landKey          = 160
+  self.landKeyText      = "SHIFT"
+  self.airKey           = 81
+  self.airKeyText       = "Q"
+  self.controllerAction = Action.VehicleFireLeft
+  self.controllerText   = "LB"
+
   -- Default Settings
   self.strength           = 100
   self.defaultLandBoost   = true
@@ -97,11 +105,11 @@ function Boost:Render(args)
 
   -- Boost
   if land or boat then
-    if Key:IsDown(160) then -- LShift
+    if Key:IsDown(self.landKey) then
       self:Boost(vehicle)
     end
   elseif heli or plane then
-    if Key:IsDown(81) then -- Q
+    if Key:IsDown(self.airKey) then
       self:Boost(vehicle)
     end
   end
@@ -110,12 +118,12 @@ function Boost:Render(args)
   if self.textEnabled and (land or boat or heli or plane) then
     local text = "Hold "
     if land or boat then
-      text = text .. "SHIFT "
+      text = text .. self.landKeyText .. " "
     elseif heli or plane then
-      text = text .. "Q "
+      text = text .. self.airKeyText .. " "
     end
     if self.padEnabled then
-      text = text .. "or LB "
+      text = text .. "or " .. self.controllerText .. " "
     end
     text = text .. "to boost"
 
@@ -152,7 +160,7 @@ end
 function Boost:LocalPlayerInput(args)
   if self.windowOpen then return false end
   if self.padEnabled
-      and args.input == Action.VehicleFireLeft
+      and args.input == self.controllerAction
       and LocalPlayer:GetWorld() == DefaultWorld
       and Game:GetSetting(GameSetting.GamepadInUse) == 1 then
     local vehicle = LocalPlayer:GetVehicle()
